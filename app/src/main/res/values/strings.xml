@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">CitophonApp</string>
+
+
+    <string name="user">Usuario</string>
+    <string name="pass">Contraseña</string>
+    <string name="login">Ingresar</string>
+    <string name="made_with">Hecho con</string>
+    <string name="forgot_my_password">Olvidé mi contraseña</string>
+    <string name="subject">Proyecto Integrador I - 2018</string>
+    <string name="personal_information">Información personal</string>
+    <string name="local">Locales</string>
+    <string name="local_total">Total de locales </string>
+    <string name="local_available">Locales disponibles </string>
+    <string name="local_busy">Locales ocupados </string>
+    <string name="represent">Representante</string>
+    <string name="information">Información del local: </string>
+    <string name="members">Miembros</string>
+    <string name="call">Llamar</string>
+
+</resources>

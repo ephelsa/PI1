@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#ffecb3</color>
+    <color name="colorPrimaryDark">#cbba83</color>
+    <color name="colorPrimaryAccent">#000000</color>
+    <color name="colorTextPrimary">#000000</color>
+
+    <color name="colorSecondary">#537257</color>
+    <color name="colorSecondaryDark">#29462e</color>
+    <color name="colorSecondaryAccent">#80a184</color>
+    <color name="colorTextSecondary">#ffffff</color>
+
+    <color name="backgroundLogin">#ffe0b2</color>
+    <color name="textContent">#616161</color>
+    <color name="textInformation">#d1d1d1</color>
+    <color name="separator">#9c9c9c</color>
+
+    <color name="transparent">#00000000</color>
+
+</resources>
