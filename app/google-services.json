@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "238726152711",
+    "firebase_url": "https://citophonapp.firebaseio.com",
+    "project_id": "citophonapp",
+    "storage_bucket": "citophonapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:238726152711:android:37728b073c30deca",
+        "android_client_info": {
+          "package_name": "com.citophonapp.integrador.citophonapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "238726152711-jbh0u168d4hseqhlevun6bcjbe2bmncu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDyJN5iXUn4s002cazE-3OwhSSRjrKifNk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
