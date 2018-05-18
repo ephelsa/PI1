@@ -2,6 +2,8 @@ package com.citophonapp.integrador.citophonapp.fragment;
 
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -35,6 +37,7 @@ public class InformationFragment extends Fragment {
     private View rootView;
 
     private Button callButton;
+    private AlertDialog.Builder builder;
 
     private Call call;
     private SinchClient sinchClient;
@@ -57,6 +60,7 @@ public class InformationFragment extends Fragment {
                     1);
         }
 
+
         sinchClient = Sinch.getSinchClientBuilder()
                 .context(getContext())
                 .userId(SinchConfig.CALLER_ID)
@@ -64,6 +68,7 @@ public class InformationFragment extends Fragment {
                 .applicationSecret(SinchConfig.APP_SECRET)
                 .environmentHost(SinchConfig.ENVIRONMENT)
                 .build();
+        sinchClient.getCallClient().addCallClientListener(new SinchCallClientListener());
 
         sinchClient.setSupportCalling(true);
         sinchClient.startListeningOnActiveConnection();
@@ -81,6 +86,23 @@ public class InformationFragment extends Fragment {
                     call.addCallListener(new SinchCallListener());
                     callButton.setText("Colgar");
                 } else {
+                    call.hangup();
+                }
+            }
+        });
+
+        builder = new AlertDialog.Builder(getActivity());
+// Add the buttons
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                if (call != null) {
+                    call.answer();
+                }
+            }
+        });
+        builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                if (call != null) {
                     call.hangup();
                 }
             }
@@ -117,11 +139,20 @@ public class InformationFragment extends Fragment {
     private class SinchCallClientListener implements CallClientListener {
         @Override
         public void onIncomingCall(CallClient callClient, Call incomingCall) {
-            call = incomingCall;
+            if (call == null) {
+                call = incomingCall;
+                call.addCallListener(new SinchCallListener());
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            /*call = incomingCall;
             Toast.makeText(getContext(), "Llamada entrante", Toast.LENGTH_SHORT).show();
             call.answer();
-            call.addCallListener(new SinchCallListener());
-            callButton.setText("Colgar");
+            call.addCallListener(new SinchCallListener());*/
+                callButton.setText("Colgar");
+            }
         }
     }
+
+
 }
