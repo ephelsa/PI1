@@ -4,6 +4,7 @@ package com.citophonapp.integrador.citophonapp.fragment;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -18,6 +19,8 @@ import android.widget.Toast;
 
 import com.citophonapp.integrador.citophonapp.R;
 import com.citophonapp.integrador.citophonapp.config.SinchConfig;
+import com.citophonapp.integrador.citophonapp.entity.User;
+import com.google.gson.Gson;
 import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.Sinch;
 import com.sinch.android.rtc.SinchClient;
@@ -33,20 +36,32 @@ import java.util.List;
  * A simple {@link Fragment} subclass.
  */
 public class InformationFragment extends Fragment {
+    private final String SHARED = "login";
 
     private View rootView;
 
     private Button callButton;
     private AlertDialog.Builder builder;
 
+
     private Call call;
     private SinchClient sinchClient;
 
+    private User user;
 
     public InformationFragment() {
         // Required empty public constructor
     }
 
+    private User readSharedPreferences() {
+        SharedPreferences value = getActivity().getSharedPreferences(SHARED, 0);
+        String l = value.getString("user", null);
+        Gson gson = new Gson();
+
+        User user = gson.fromJson(l, User.class);
+        return user;
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -59,11 +74,11 @@ public class InformationFragment extends Fragment {
                     new String[]{android.Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_PHONE_STATE},
                     1);
         }
-
+        user = readSharedPreferences();
 
         sinchClient = Sinch.getSinchClientBuilder()
                 .context(getContext())
-                .userId(SinchConfig.CALLER_ID)
+                .userId(user.getCallId())
                 .applicationKey(SinchConfig.APP_KEY)
                 .applicationSecret(SinchConfig.APP_SECRET)
                 .environmentHost(SinchConfig.ENVIRONMENT)
