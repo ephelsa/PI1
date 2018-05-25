@@ -25,6 +25,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class LoginActivity extends AppCompatActivity {
     //firebase metodos
     private FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -50,7 +53,7 @@ public class LoginActivity extends AppCompatActivity {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String username = user.getText().toString();
+                final String username = user.getText().toString();
                 //se realiza una busqueda en la base de datos para obtener el correo para login
                 reference.child(username).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -58,7 +61,22 @@ public class LoginActivity extends AppCompatActivity {
                         //se verifica que exista el snap correspondiente a la llave primaria
                         if (dataSnapshot.exists()) {
                             //de existir se serializa en el objeto la informacion
-                            final User user = dataSnapshot.getValue(User.class);
+                            User user = new User();
+                            user.setDocument(dataSnapshot.child("document").getValue(String.class));
+                            user.setAge(dataSnapshot.child("age").getValue(String.class));
+                            user.setCallId(dataSnapshot.child("callId").getValue(String.class));
+                            user.setEmail(dataSnapshot.child("email").getValue(String.class));
+                            user.setName(dataSnapshot.child("name").getValue(String.class));
+                            user.setVigilant(dataSnapshot.child("vigilant").getValue(Boolean.class));
+                            List<String> members = new ArrayList<>();
+                            for (DataSnapshot snap : dataSnapshot.child("members").getChildren()) {
+                                members.add(snap.getValue(String.class));
+
+                            }
+                            user.setMembers(members);
+
+                            CreateSharedPreferences(user);
+
                             //Se verifica que sea vigilante para poder acceder al modulo
                             if (user.getVigilant()) {
                                 //se llama el metodo de inicio de sessión
@@ -69,7 +87,7 @@ public class LoginActivity extends AppCompatActivity {
                                                 //si se completo la operacion
 
                                                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                                                CreateSharedPreferences(user);
+
                                                 startActivity(intent);
                                             }
                                         }).addOnFailureListener(new OnFailureListener() {
@@ -77,6 +95,9 @@ public class LoginActivity extends AppCompatActivity {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
                                         Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                                        if (existpreference()) {
+                                            deleteDatabase(SHARED);
+                                        }
                                     }
                                 });
                                 //si la llave primaria no se encuentra
