@@ -42,15 +42,18 @@
 
         </android.support.v7.widget.Toolbar>
 
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginTop="8dp"
             android:orientation="vertical">
 
-            <include
-                android:id="@+id/inforA"
-                layout="@layout/cardview_information" />
+            <android.support.v7.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/localRv" />
+
 
         </LinearLayout>
 

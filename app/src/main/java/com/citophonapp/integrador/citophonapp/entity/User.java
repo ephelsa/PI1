@@ -10,6 +10,7 @@ public class User implements Serializable {
     private Boolean vigilant;
     private String document;
     private String age;
+    private String localNumber;
     private List<String> members;
 
     public User() {
@@ -79,5 +80,13 @@ public class User implements Serializable {
 
     public void setMembers(List<String> members) {
         this.members = members;
+    }
+
+    public String getLocalNumber() {
+        return localNumber;
+    }
+
+    public void setLocalNumber(String localNumber) {
+        this.localNumber = localNumber;
     }
 }

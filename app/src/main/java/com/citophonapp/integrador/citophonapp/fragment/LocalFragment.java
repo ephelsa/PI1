@@ -4,12 +4,16 @@ package com.citophonapp.integrador.citophonapp.fragment;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.ImageButton;
 
 import com.citophonapp.integrador.citophonapp.R;
+import com.citophonapp.integrador.citophonapp.adapter.RvAdapter;
 import com.citophonapp.integrador.citophonapp.entity.User;
 import com.citophonapp.integrador.citophonapp.parent.FragmentFragmentUsage;
 import com.google.firebase.database.DataSnapshot;
@@ -29,10 +33,12 @@ public class LocalFragment extends FragmentFragmentUsage implements View.OnClick
     // View Element
     private InformationFragment informationFragment;
 
+    private RecyclerView rv;
     private CardView infoA;
     private ImageButton showMore;
 
     private List<User> users;
+    private RvAdapter rva;
 
     //firebasedatabase variables
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -51,7 +57,11 @@ public class LocalFragment extends FragmentFragmentUsage implements View.OnClick
 
         //iniciacion variables
         users = new ArrayList<>();
+        rv = (RecyclerView) rootView.findViewById(R.id.localRv);
+        rv.setLayoutManager(new LinearLayoutManager(getContext()));
+        rv.setHasFixedSize(true);
 
+        /*
         // Control
         fragmentManager = getActivity().getSupportFragmentManager();
 
@@ -61,7 +71,7 @@ public class LocalFragment extends FragmentFragmentUsage implements View.OnClick
 
         // Click event
         showMore.setOnClickListener(this);
-
+*/
         //metodo de carga de datos bd
         loadData();
 
@@ -85,7 +95,14 @@ public class LocalFragment extends FragmentFragmentUsage implements View.OnClick
                 //busqueda en la lista optenida
                 for (DataSnapshot snap : dataSnapshot.getChildren()) {
                     //la lista solo agrega personas que no sean vigilantes
-                    if (!snap.child("vigilant").getValue(Boolean.class)) {
+
+                    /*
+                     *
+                     ***********************************************************
+                     **Este if es para que no aparezcan vigilantes en la lista**
+                     ***********************************************************
+                     */
+                    // if (!snap.child("vigilant").getValue(Boolean.class)) {
                         User user = new User();
                         user.setDocument(snap.child("document").getValue(String.class));
                         user.setAge(snap.child("age").getValue(String.class));
@@ -93,6 +110,7 @@ public class LocalFragment extends FragmentFragmentUsage implements View.OnClick
                         user.setEmail(snap.child("email").getValue(String.class));
                         user.setName(snap.child("name").getValue(String.class));
                         user.setVigilant(snap.child("vigilant").getValue(Boolean.class));
+                    user.setLocalNumber(snap.child("localNumber").getValue(String.class));
                         List<String> members = new ArrayList<>();
                         for (DataSnapshot snapshot : dataSnapshot.child("members").getChildren()) {
                             members.add(snapshot.getValue(String.class));
@@ -100,8 +118,10 @@ public class LocalFragment extends FragmentFragmentUsage implements View.OnClick
                         }
                         user.setMembers(members);
                         users.add(user);
-                    }
+                    //     }
                 }
+                rva = new RvAdapter(users);
+                rv.setAdapter(rva);
             }
 
             @Override

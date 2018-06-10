@@ -48,10 +48,12 @@ public class InformationFragment extends Fragment {
     private SinchClient sinchClient;
 
     private User user;
+    private User callUser;
 
     public InformationFragment() {
         // Required empty public constructor
     }
+
 
     private User readSharedPreferences() {
         SharedPreferences value = getActivity().getSharedPreferences(SHARED, 0);
@@ -66,6 +68,10 @@ public class InformationFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            callUser = (User) bundle.get("callUser");
+        }
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_information, container, false);
 
@@ -97,7 +103,7 @@ public class InformationFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (call == null) {
-                    call = sinchClient.getCallClient().callUser(SinchConfig.RECIPENT_ID);
+                    call = sinchClient.getCallClient().callUser(callUser.getCallId());
                     call.addCallListener(new SinchCallListener());
                     callButton.setText("Colgar");
                 } else {
