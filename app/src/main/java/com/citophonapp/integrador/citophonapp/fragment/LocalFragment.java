@@ -102,7 +102,7 @@ public class LocalFragment extends FragmentFragmentUsage implements View.OnClick
                      **Este if es para que no aparezcan vigilantes en la lista**
                      ***********************************************************
                      */
-                    // if (!snap.child("vigilant").getValue(Boolean.class)) {
+                    if (!snap.child("vigilant").getValue(Boolean.class)) {
                         User user = new User();
                         user.setDocument(snap.child("document").getValue(String.class));
                         user.setAge(snap.child("age").getValue(String.class));
@@ -112,13 +112,13 @@ public class LocalFragment extends FragmentFragmentUsage implements View.OnClick
                         user.setVigilant(snap.child("vigilant").getValue(Boolean.class));
                     user.setLocalNumber(snap.child("localNumber").getValue(String.class));
                         List<String> members = new ArrayList<>();
-                        for (DataSnapshot snapshot : dataSnapshot.child("members").getChildren()) {
+                        for (DataSnapshot snapshot : snap.child("members").getChildren()) {
                             members.add(snapshot.getValue(String.class));
 
                         }
                         user.setMembers(members);
                         users.add(user);
-                    //     }
+                    }
                 }
                 rva = new RvAdapter(users);
                 rv.setAdapter(rva);

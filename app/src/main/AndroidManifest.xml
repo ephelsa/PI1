@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.citophonapp.integrador.citophonapp">
 
-
     <uses-feature
         android:name="android.hardware.microphone"
         android:required="false" />
@@ -30,7 +29,8 @@
         <activity android:name=".activity.MainActivity" />
         <activity
             android:name=".activity.ContainerActivity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
+        <activity android:name=".activity.UserActivity"></activity>
     </application>
 
 </manifest>

@@ -1,5 +1,4 @@
-package com.citophonapp.integrador.citophonapp.fragment;
-
+package com.citophonapp.integrador.citophonapp.activity;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -7,13 +6,12 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
-import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.view.LayoutInflater;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +19,7 @@ import android.widget.Toast;
 import com.citophonapp.integrador.citophonapp.R;
 import com.citophonapp.integrador.citophonapp.config.SinchConfig;
 import com.citophonapp.integrador.citophonapp.entity.User;
+import com.citophonapp.integrador.citophonapp.fragment.InformationFragment;
 import com.google.gson.Gson;
 import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.Sinch;
@@ -33,59 +32,58 @@ import com.sinch.android.rtc.calling.CallListener;
 
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class InformationFragment extends Fragment {
+public class UserActivity extends AppCompatActivity {
     private final String SHARED = "login";
 
-    private View rootView;
-    private TextView members, represent;
 
-    private Button callButton;
     private AlertDialog.Builder builder;
 
 
     private Call call;
     private SinchClient sinchClient;
+    private Button callButton;
+    private TextView member, represent;
 
     private User user;
-    private User callUser;
 
-    public InformationFragment() {
-        // Required empty public constructor
-    }
-
-
-    private User readSharedPreferences() {
-        SharedPreferences value = getActivity().getSharedPreferences(SHARED, 0);
-        String l = value.getString("user", null);
-        Gson gson = new Gson();
-
-        User user = gson.fromJson(l, User.class);
-        return user;
-
-    }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        Bundle bundle = getArguments();
-        if (bundle != null) {
-            callUser = (User) bundle.get("callUser");
-        }
-        // Inflate the layout for this fragment
-        rootView = inflater.inflate(R.layout.fragment_information, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_user);
 
-        if (ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(),
+        callButton = (Button) findViewById(R.id.usercallButton);
+        member = (TextView) findViewById(R.id.usermembers);
+        represent = (TextView) findViewById(R.id.userrepresent);
+
+
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(UserActivity.this,
                     new String[]{android.Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_PHONE_STATE},
                     1);
         }
         user = readSharedPreferences();
 
+        represent.setText(user.getName());
+        String members = "";
+
+        for (String k : user.getMembers()) {
+            members += "\n" + k;
+        }
+        member.setText(members);
+
+
+        callButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (call != null) {
+                    call.hangup();
+                }
+            }
+        });
+
         sinchClient = Sinch.getSinchClientBuilder()
-                .context(getContext())
+                .context(getApplicationContext())
                 .userId(user.getCallId())
                 .applicationKey(SinchConfig.APP_KEY)
                 .applicationSecret(SinchConfig.APP_SECRET)
@@ -99,29 +97,7 @@ public class InformationFragment extends Fragment {
 
         sinchClient.getCallClient().addCallClientListener(new SinchCallClientListener());
 
-        members = (TextView) rootView.findViewById(R.id.members);
-        represent = (TextView) rootView.findViewById(R.id.represent);
-        callButton = (Button) rootView.findViewById(R.id.callButton);
-        String members2 = "";
-        for (String k : callUser.getMembers()) {
-            members2 += "\n" + k;
-        }
-        members.setText(members2);
-        represent.setText(callUser.getName());
-        callButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (call == null) {
-                    call = sinchClient.getCallClient().callUser(callUser.getCallId());
-                    call.addCallListener(new SinchCallListener());
-                    callButton.setText("Colgar");
-                } else {
-                    call.hangup();
-                }
-            }
-        });
-
-        builder = new AlertDialog.Builder(getActivity());
+        builder = new AlertDialog.Builder(this);
 // Add the buttons
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
@@ -138,31 +114,47 @@ public class InformationFragment extends Fragment {
             }
         });
 
-        return rootView;
+
     }
 
+
+    private User readSharedPreferences() {
+        SharedPreferences value = (UserActivity.this).getSharedPreferences(SHARED, 0);
+        String l = value.getString("user", null);
+        Gson gson = new Gson();
+
+        User user = gson.fromJson(l, User.class);
+        return user;
+
+    }
+
+
     private class SinchCallListener implements CallListener {
+
         @Override
-        public void onCallEnded(Call endedCall) {
-            call = null;
-            SinchError a = endedCall.getDetails().getError();
-            callButton.setText("Llamar");
-            getActivity().setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
+        public void onCallProgressing(Call progressingCall) {
+            Toast.makeText(getApplicationContext(), "Llamando", Toast.LENGTH_SHORT).show();
+
         }
 
         @Override
         public void onCallEstablished(Call establishedCall) {
-            Toast.makeText(getContext(), "Conectado", Toast.LENGTH_SHORT).show();
-            getActivity().setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+            Toast.makeText(getApplicationContext(), "Conectado", Toast.LENGTH_SHORT).show();
+
+            (UserActivity.this).setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
         }
 
         @Override
-        public void onCallProgressing(Call progressingCall) {
-            Toast.makeText(getContext(), "Llamando", Toast.LENGTH_SHORT).show();
+        public void onCallEnded(Call endedCall) {
+            call = null;
+            SinchError a = endedCall.getDetails().getError();
+
+            UserActivity.this.setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
         }
 
         @Override
-        public void onShouldSendPushNotification(Call call, List<PushPair> pushPairs) {
+        public void onShouldSendPushNotification(Call call, List<PushPair> list) {
+
         }
     }
 
@@ -179,7 +171,7 @@ public class InformationFragment extends Fragment {
             Toast.makeText(getContext(), "Llamada entrante", Toast.LENGTH_SHORT).show();
             call.answer();
             call.addCallListener(new SinchCallListener());*/
-                callButton.setText("Colgar");
+                callButton.setVisibility(View.VISIBLE);
             }
         }
     }

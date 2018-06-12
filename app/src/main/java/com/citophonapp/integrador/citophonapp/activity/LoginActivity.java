@@ -103,7 +103,26 @@ public class LoginActivity extends AppCompatActivity {
                                 //si la llave primaria no se encuentra
 
                             } else {
-                                Toast.makeText(getApplicationContext(), "No tiene permisos para iniciar sessión", Toast.LENGTH_LONG).show();
+                                auth.signInWithEmailAndPassword(user.getEmail(), password.getText().toString())
+                                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                                //si se completo la operacion
+
+                                                Intent intent = new Intent(getApplicationContext(), UserActivity.class);
+
+                                                startActivity(intent);
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                    //si la operacion falla
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                                        if (existpreference()) {
+                                            deleteDatabase(SHARED);
+                                        }
+                                    }
+                                });
                             }
                         } else {
                             Toast.makeText(getApplicationContext(), "Usuario no existente", Toast.LENGTH_LONG).show();
@@ -131,8 +150,13 @@ public class LoginActivity extends AppCompatActivity {
         //si el usuario existe pasa a la proxima ventana
         if (user != null) {
             if (existpreference()) {
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
+                if (readSharedPreferences().getVigilant()) {
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    startActivity(intent);
+                } else {
+                    Intent intent = new Intent(getApplicationContext(), UserActivity.class);
+                    startActivity(intent);
+                }
             } else {
                 auth.signOut();
                 Toast.makeText(getApplicationContext(), "No se encontraron datos de usuario inicie de nuevo", Toast.LENGTH_LONG).show();
