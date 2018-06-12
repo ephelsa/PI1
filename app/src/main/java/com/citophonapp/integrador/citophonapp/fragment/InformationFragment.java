@@ -104,7 +104,7 @@ public class InformationFragment extends Fragment {
         callButton = (Button) rootView.findViewById(R.id.callButton);
         String members2 = "";
         for (String k : callUser.getMembers()) {
-            members2 += "\n" + k;
+            members2 += k + "\n";
         }
         members.setText(members2);
         represent.setText(callUser.getName());

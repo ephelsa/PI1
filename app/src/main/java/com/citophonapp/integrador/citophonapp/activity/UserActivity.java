@@ -6,6 +6,9 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -56,7 +59,6 @@ public class UserActivity extends AppCompatActivity {
         member = (TextView) findViewById(R.id.usermembers);
         represent = (TextView) findViewById(R.id.userrepresent);
 
-
         if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(UserActivity.this,
                     new String[]{android.Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_PHONE_STATE},
@@ -68,7 +70,7 @@ public class UserActivity extends AppCompatActivity {
         String members = "";
 
         for (String k : user.getMembers()) {
-            members += "\n" + k;
+            members += k + "\n";
         }
         member.setText(members);
 
@@ -78,6 +80,7 @@ public class UserActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (call != null) {
                     call.hangup();
+                    callButton.setVisibility(View.INVISIBLE);
                 }
             }
         });
@@ -99,17 +102,21 @@ public class UserActivity extends AppCompatActivity {
 
         builder = new AlertDialog.Builder(this);
 // Add the buttons
-        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+        builder.setTitle("Tienes una llamada");
+        builder.setPositiveButton("Contestar", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 if (call != null) {
                     call.answer();
+                    callButton.setVisibility(View.VISIBLE);
+
                 }
             }
         });
-        builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("Rechazar", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 if (call != null) {
                     call.hangup();
+
                 }
             }
         });
@@ -166,12 +173,13 @@ public class UserActivity extends AppCompatActivity {
                 call.addCallListener(new SinchCallListener());
 
                 AlertDialog dialog = builder.create();
+
                 dialog.show();
             /*call = incomingCall;
             Toast.makeText(getContext(), "Llamada entrante", Toast.LENGTH_SHORT).show();
             call.answer();
             call.addCallListener(new SinchCallListener());*/
-                callButton.setVisibility(View.VISIBLE);
+
             }
         }
     }
